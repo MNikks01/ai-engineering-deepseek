@@ -1,0 +1,11 @@
+{
+  "name": "chater",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm run --parallel dev",
+    "build": "pnpm run --parallel build"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}

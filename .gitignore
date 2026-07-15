@@ -1,0 +1,56 @@
+# ==== Environment & Secrets ====
+.env
+.env.*.local
+.env.local
+.env.production
+*.pem
+
+# ==== Node.js / PNPM ====
+node_modules/
+.pnpm-store/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ==== Build Outputs ====
+dist/
+build/
+out/
+.next/
+*.tsbuildinfo
+
+# ==== Frontend (Vite) ====
+# Vite generates these in the build folder, but they are inside dist/
+# dist/ is already covered above.
+
+# ==== IDE & Editor ====
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# ==== OS / System ====
+.DS_Store
+Thumbs.db
+*.tmp
+*.temp
+
+# ==== Testing & Coverage ====
+coverage/
+.nyc_output/
+vitest-coverage/
+
+# ==== Docker (optional) ====
+# If you build images locally, you might want to keep them, but usually not.
+# *.dockerignore is tracked separately.
+
+# ==== Misc ====
+# Keep your local dev data separate if you add SQLite or local storage
+*.sqlite
+*.db
+local-data/
