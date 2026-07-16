@@ -2,6 +2,7 @@
 
 ## 🏗️ Architecture Overview
 
+```bash
 ──────────────────────────────────────────────────────────────┐
 │ Browser (React) │
 │ ┌─────────┐ ┌─────────────┐ ┌────────────────────────┐ │
@@ -30,6 +31,7 @@
 │ │ Docker │ │ GitHub CI │ │ Prometheus/Grafana │ │
 │ └────────────┘ └────────────┘ └──────────────────────┘ │
 └──────────────────────────────────────────────────────────────┘
+```
 
 ---
 
@@ -89,8 +91,9 @@ CREATE TABLE threads (
 );
 ```
 
-Messages Table
-sql
+### Messages Table
+
+```sql
 CREATE TABLE messages (
 id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 thread_id UUID REFERENCES threads(id) ON DELETE CASCADE,
@@ -98,78 +101,91 @@ role TEXT CHECK (role IN ('user', 'assistant', 'system')),
 content TEXT NOT NULL,
 created_at TIMESTAMP DEFAULT NOW()
 );
+```
 
-Application State (Frontend)
-typescript
+### Application State (Frontend)
+
+```typescript
 interface Thread {
-id: string;
-title: string;
-created_at: string;
+  id: string;
+  title: string;
+  created_at: string;
 }
 
 interface Message {
-id: string;
-thread_id: string;
-role: 'user' | 'assistant' | 'system';
-content: string;
-created_at: string;
+  id: string;
+  thread_id: string;
+  role: 'user' | 'assistant' | 'system';
+  content: string;
+  created_at: string;
 }
+```
 
-🔌 API Specifications
+## API Specifications
 
-1. POST /api/chat/stream
-   Description: Stream an AI response for a conversation.
+### 1. POST /api/chat/stream
+
+| Description: Stream an AI response for a conversation.
 
 Request:
 
-json
+```json
 {
-"messages": [
-{ "role": "user", "content": "Hello!" }
-],
-"threadId": "uuid" // optional; creates new if omitted
+  "messages": [{ "role": "user", "content": "Hello!" }],
+  "threadId": "uuid" // optional; creates new if omitted
 }
+```
+
 Response: Server‑Sent Events (SSE)
 
-Event Type Payload Description
-token { type: "token", content: "partial" } Streaming token
-done { type: "done" } Stream finished
-error { type: "error", message: "..." } Error occurred 2. GET /api/threads
-Description: Get all threads for the current user.
+| Event Type | Payload                               | Description     |
+| ---------- | ------------------------------------- | --------------- |
+| token      | { type: "token", content: "partial" } | Streaming token |
+| done       | { type: "done" }                      | Stream finished |
+| error      | { type: "error", message: "..." }     | Error occurred  |
 
+### 2. GET /api/threads
+
+| Description: Get all threads for the current user.
 Response:
 
-json
+```json
 {
-"threads": [
-{ "id": "uuid", "title": "New Chat", "created_at": "2024-01-01T00:00:00Z" }
-]
-} 3. GET /api/threads/:id/messages
-Description: Get all messages for a specific thread.
-
-Response:
-
-json
-{
-"messages": [
-{ "id": "uuid", "role": "user", "content": "Hello!", "created_at": "..." }
-]
+  "threads": [{ "id": "uuid", "title": "New Chat", "created_at": "2024-01-01T00:00:00Z" }]
 }
-🔐 Security
+```
+
+### 3. GET /api/threads/:id/messages
+
+| Description: Get all messages for a specific thread.
+Response:
+
+```json
+{
+  "messages": [{ "id": "uuid", "role": "user", "content": "Hello!", "created_at": "..." }]
+}
+```
+
+## Security
+
 Requirement Implementation
 API Key Management Stored in .env, never exposed to frontend
 CORS Configured to allow only frontend origin
 Input Validation Check message arrays before processing
 Rate Limiting (Future) Restrict requests per IP
 Authentication (Future) JWT for multi‑user support
-🚦 Performance & Monitoring
+
+## Performance & Monitoring
+
 Metric Tool Target
 Request Latency Express middleware < 200ms (excluding AI)
 Token Cost OpenAI dashboard Track per request
 Error Rate Logging + Prometheus < 1%
 Memory Usage Node.js memory profiling < 500MB
 Database Connections Pool management Max 20 connections
-🧪 Testing Strategy
+
+## Testing Strategy
+
 Test Type Tool Coverage Target
 Unit Tests Vitest > 70%
 Integration Tests Vitest + Supertest Critical paths
@@ -177,6 +193,8 @@ E2E Tests (Future) Playwright User flows
 Performance Tests k6 Load testing
 
 Deployment Architecture
+
+```bash
 ┌─────────────────────────────────────────────────────────┐
 │ AWS / VPS │
 │ ┌──────────────────────────────────────────────────┐ │
@@ -196,3 +214,4 @@ Deployment Architecture
 │ │ GitHub Actions (CI/CD) │ │
 │ └──────────────────────────────────────────────────┘ │
 └─────────────────────────────────────────────────────────┘
+```
