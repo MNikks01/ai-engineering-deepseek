@@ -54,3 +54,5 @@ vitest-coverage/
 *.sqlite
 *.db
 local-data/
+
+combined-code.txt
