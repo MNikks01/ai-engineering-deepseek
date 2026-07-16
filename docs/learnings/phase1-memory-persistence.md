@@ -114,10 +114,13 @@ if (threadId && fullResponse) {
 - Assistant messages not saving - Forgot to pass threadId to streamChatCompletion. Fixed by adding it as the 3rd parameter.
 - Port 5432 already in use - Check if another PostgreSQL instance is running locally. Stop it with brew services stop postgresql or change the ports mapping in docker-compose.yml.
 
-## Tests Written
+## 🧪 Tests Written
 
-- apps/api/src/utils/**tests**/tokenizer.test.ts
-  Counts tokens correctly for various inputs (basic).
-- apps/api/src/utils/**tests**/truncation.test.ts
-  Ensures truncation keeps system prompt + newest messages.
-  To be added: Integration tests that verify messages are actually saved to the database.
+| Test File                                             | Purpose                                                                                                          |
+| :---------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------- |
+| `apps/api/src/utils/__tests__/tokenizer.test.ts`      | Counts tokens correctly for various inputs.                                                                      |
+| `apps/api/src/utils/__tests__/truncation.test.ts`     | Ensures truncation keeps system prompt + newest messages. Uses mocked `countTokens` for deterministic math.      |
+| `apps/api/src/routes/__tests__/chat.routes.test.ts`   | Integration tests for the `/stream` route: creates threads, fetches history, saves messages, and handles errors. |
+| `apps/api/src/services/__tests__/llm.service.test.ts` | Basic sanity – ensures the module loads.                                                                         |
+
+**Test Results:** ✅ 15 tests passing.

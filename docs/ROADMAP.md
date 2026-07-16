@@ -30,32 +30,36 @@
 
 ---
 
-## 🔄 Phase 1: Memory & Persistence (In Progress)
+## ✅ Phase 1: Memory & Persistence (Completed)
 
 **Duration:** 3 Days  
 **Goal:** Store conversations and manage context windows.
 
-### Tasks
+### Tasks Completed
 
-- [ ] PostgreSQL setup (Docker or local)
-- [ ] Threads & messages schema
-- [ ] CRUD for threads and messages
-- [ ] `tiktoken` token counting
-- [ ] Context truncation (sliding window)
-- [ ] Save user & assistant messages to DB
-- [ ] Thread creation on first message
+- [x] PostgreSQL setup (Docker)
+- [x] Threads & messages schema
+- [x] CRUD for threads and messages
+- [x] `tiktoken` token counting
+- [x] Context truncation (sliding window)
+- [x] Save user & assistant messages to DB
+- [x] Thread creation on first message
+- [x] Unit tests for tokenizer and truncation
+- [x] Integration tests for chat routes
 
 ### Deliverables
 
 - Conversations persist after page refresh
 - Automatic token management (no context overflow errors)
 - Thread ID support in API
+- 15 passing tests (unit + integration)
 
-### Key Learning Objectives
+### Key Learnings
 
-- Token counting mechanics
-- Context window limitations
-- Database integration with raw SQL
+- Token counting mechanics with `tiktoken`
+- Context window limitations and sliding windows
+- Database integration with raw SQL (Connection Pooling)
+- Properly freeing the `tiktoken` encoder to prevent memory leaks
 
 ---
 
@@ -183,20 +187,20 @@
 
 ## 📊 Progress Tracking
 
-| Phase   | Status         | Completed |
-| :------ | :------------- | :-------- |
-| Phase 0 | ✅ Done        | 100%      |
-| Phase 1 | 🔄 In Progress | 0%        |
-| Phase 2 | ⏳ Planned     | 0%        |
-| Phase 3 | ⏳ Planned     | 0%        |
-| Phase 4 | ⏳ Planned     | 0%        |
-| Phase 5 | ⏳ Planned     | 0%        |
-| Phase 6 | 💡 Ideation    | 0%        |
+| Phase   | Status      | Completed |
+| :------ | :---------- | :-------- |
+| Phase 0 | ✅ Done     | 100%      |
+| Phase 1 | ✅ Done     | 100%      |
+| Phase 2 | ⏳ Planned  | 0%        |
+| Phase 3 | ⏳ Planned  | 0%        |
+| Phase 4 | ⏳ Planned  | 0%        |
+| Phase 5 | ⏳ Planned  | 0%        |
+| Phase 6 | 💡 Ideation | 0%        |
 
 ---
 
 ## 🧭 Current Focus
 
-**We are here:** Phase 1 – adding PostgreSQL and context management.
+**We are here:** Phase 2 – building the Thread Management UI.
 
-**Next step:** Set up the database and implement token truncation.
+**Next step:** Implement sidebar, thread switching, and deletion.
