@@ -5,3 +5,4 @@ coverage
 .pnpm-store
 *.log
 .env
+pnpm-lock.yaml  
