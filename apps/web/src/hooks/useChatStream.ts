@@ -5,7 +5,10 @@ export function useChatStream() {
   const [isStreaming, setIsStreaming] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const sendMessage = async (messages: { role: string; content: string }[]) => {
+  const sendMessage = async (
+    messages: { role: string; content: string }[],
+    threadId?: string // 👈 added parameter
+  ) => {
     setStreamingText('');
     setIsStreaming(true);
     setError(null);
@@ -14,7 +17,7 @@ export function useChatStream() {
       const response = await fetch('/api/chat/stream', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages }),
+        body: JSON.stringify({ messages, threadId }), // 👈 send threadId
       });
 
       if (!response.ok) {
@@ -28,7 +31,6 @@ export function useChatStream() {
       let buffer = '';
       let done = false;
 
-      // Replace while (true) with a loop that checks the `done` flag
       while (!done) {
         const result = await reader.read();
         done = result.done;
@@ -63,7 +65,6 @@ export function useChatStream() {
         }
       }
     } catch (err: unknown) {
-      // 👈 Use `unknown` instead of `any`
       const message = err instanceof Error ? err.message : 'Something went wrong';
       setError(message);
       setIsStreaming(false);
