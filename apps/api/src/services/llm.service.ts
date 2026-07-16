@@ -1,5 +1,6 @@
 import OpenAI from 'openai';
 import { Response } from 'express';
+import { pool } from '../config/db';
 
 let openai: OpenAI | null = null;
 
@@ -14,7 +15,6 @@ function getOpenAIClient(): OpenAI {
   return openai;
 }
 
-// Define a type for SSE data (could be more specific)
 type SSEPayload = { type: string; content?: string; message?: string };
 
 function sendSSE(res: Response, data: SSEPayload) {
@@ -23,7 +23,8 @@ function sendSSE(res: Response, data: SSEPayload) {
 
 export async function streamChatCompletion(
   messages: { role: 'system' | 'user' | 'assistant'; content: string }[],
-  res: Response
+  res: Response,
+  threadId?: string // 👈 new parameter
 ) {
   res.setHeader('Content-Type', 'text/event-stream');
   res.setHeader('Cache-Control', 'no-cache');
@@ -33,9 +34,10 @@ export async function streamChatCompletion(
   let isAborted = false;
   res.on('close', () => {
     isAborted = true;
-    // console.log is now allowed, but we can keep it
     console.log('Client disconnected, stopping stream...');
   });
+
+  let fullResponse = ''; // 👈 accumulate the full answer
 
   try {
     const client = getOpenAIClient();
@@ -55,12 +57,22 @@ export async function streamChatCompletion(
 
       const content = chunk.choices[0]?.delta?.content;
       if (content) {
+        fullResponse += content; // 👈 accumulate
         sendSSE(res, { type: 'token', content });
       }
 
       if (chunk.choices[0]?.finish_reason === 'stop') {
         sendSSE(res, { type: 'done' });
       }
+    }
+
+    // 👇 Save assistant message if threadId is provided
+    if (threadId && fullResponse) {
+      await pool.query('INSERT INTO messages (thread_id, role, content) VALUES ($1, $2, $3)', [
+        threadId,
+        'assistant',
+        fullResponse,
+      ]);
     }
 
     res.end();
