@@ -26,10 +26,7 @@ function App() {
   // When streaming finishes, append the assistant message to history
   React.useEffect(() => {
     if (!isStreaming && streamingText) {
-      setMessages((prev) => [
-        ...prev,
-        { role: 'assistant', content: streamingText },
-      ]);
+      setMessages((prev) => [...prev, { role: 'assistant', content: streamingText }]);
     }
   }, [isStreaming, streamingText]);
 
@@ -55,8 +52,7 @@ function App() {
                 marginBottom: 10,
               }}
             >
-              <strong>{msg.role === 'user' ? 'You' : 'AI'}:</strong>{' '}
-              <span>{msg.content}</span>
+              <strong>{msg.role === 'user' ? 'You' : 'AI'}:</strong> <span>{msg.content}</span>
             </div>
           ))}
         {isStreaming && (
@@ -65,11 +61,7 @@ function App() {
             <span style={{ animation: 'blink 1s infinite' }}>▌</span>
           </div>
         )}
-        {error && (
-          <div style={{ color: 'red', marginTop: 10 }}>
-            ❌ Error: {error}
-          </div>
-        )}
+        {error && <div style={{ color: 'red', marginTop: 10 }}>❌ Error: {error}</div>}
       </div>
 
       <form onSubmit={handleSubmit} style={{ display: 'flex', gap: 10 }}>

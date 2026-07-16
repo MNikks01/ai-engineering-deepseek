@@ -26,15 +26,18 @@ export function useChatStream() {
 
       const decoder = new TextDecoder();
       let buffer = '';
+      let done = false;
 
-      while (true) {
-        const { done, value } = await reader.read();
+      // Replace while (true) with a loop that checks the `done` flag
+      while (!done) {
+        const result = await reader.read();
+        done = result.done;
         if (done) break;
 
-        // Decode the chunk and split by double newline (SSE standard)
-        buffer += decoder.decode(value, { stream: true });
+        const chunk = result.value;
+        buffer += decoder.decode(chunk, { stream: true });
         const events = buffer.split('\n\n');
-        buffer = events.pop() || ''; // Keep incomplete event for next chunk
+        buffer = events.pop() || '';
 
         for (const event of events) {
           if (!event.trim()) continue;
@@ -52,15 +55,17 @@ export function useChatStream() {
                   setError(data.message);
                   setIsStreaming(false);
                 }
-              } catch (e) {
+              } catch (_e) {
                 // Ignore parse errors for incomplete JSON
               }
             }
           }
         }
       }
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      // 👈 Use `unknown` instead of `any`
+      const message = err instanceof Error ? err.message : 'Something went wrong';
+      setError(message);
       setIsStreaming(false);
     }
   };
