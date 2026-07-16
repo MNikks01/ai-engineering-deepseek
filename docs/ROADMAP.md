@@ -1,8 +1,3 @@
----
-
-## 📄 4. `docs/ROADMAP.md`
-
-```markdown
 # Phasewise Development Roadmap
 
 ## 📅 Overall Timeline: ~14 Days
@@ -205,7 +200,3 @@
 **We are here:** Phase 1 – adding PostgreSQL and context management.
 
 **Next step:** Set up the database and implement token truncation.
-
-```
-
-```

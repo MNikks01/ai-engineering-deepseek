@@ -24,16 +24,18 @@ pnpm dev
 ```
 
 Frontend: http://localhost:5173
-
 Backend: http://localhost:5001
 
-📚 Documentation
+## Documentation
+
 Document Description
 PRD.md Product requirements, user stories, features
 TRD.md Technical architecture, APIs, data models
 ROADMAP.md Phasewise development roadmap
 LEARNINGS.md Technical insights & lessons learned
-🛠️ Tech Stack
+
+## Tech Stack
+
 Layer Technology
 Frontend React, Vite, TypeScript
 Backend Node.js, Express, TypeScript
@@ -42,7 +44,9 @@ Database PostgreSQL + pgvector
 Streaming Server‑Sent Events (raw)
 DevOps Docker, GitHub Actions
 Tooling PNPM, ESLint, Prettier, Husky, Vitest
-📊 Project Status
+
+## Project Status
+
 Phase Status
 Phase 0 – Foundation & Streaming ✅ Complete
 Phase 1 – Memory & Persistence 🔄 In Progress
@@ -50,5 +54,7 @@ Phase 2 – Thread Management UI ⏳ Planned
 Phase 3 – System Prompts ⏳ Planned
 Phase 4 – Function / Tool Calling ⏳ Planned
 Phase 5 – Deployment ⏳ Planned
-🤝 Contributing
+
+## Contributing
+
 This is a learning project. Fork it, experiment, and build your own AI stack!
