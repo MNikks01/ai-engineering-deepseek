@@ -35,12 +35,13 @@ describe('Chat Routes - /api/chat/stream', () => {
     (pool.query as any).mockResolvedValueOnce({ rows: [] }); // SELECT history
     (pool.query as any).mockResolvedValueOnce({ rows: [] }); // INSERT user message
     // Mock streamChatCompletion to simulate streaming completion
-    (streamChatCompletion as any).mockImplementation(async (messages, res, threadId) => {
-      // Simulate sending a token and done
-      res.write(`data: ${JSON.stringify({ type: 'token', content: 'Hello' })}\n\n`);
-      res.write(`data: ${JSON.stringify({ type: 'done' })}\n\n`);
-      res.end();
-    });
+    (streamChatCompletion as any).mockImplementation(
+      async (messages: any, res: any, threadId: string) => {
+        res.write(`data: ${JSON.stringify({ type: 'token', content: 'Hello' })}\n\n`);
+        res.write(`data: ${JSON.stringify({ type: 'done' })}\n\n`);
+        res.end();
+      }
+    );
 
     const response = await request(app)
       .post('/api/chat/stream')
@@ -60,11 +61,13 @@ describe('Chat Routes - /api/chat/stream', () => {
     const mockHistory = [{ role: 'user', content: 'Previous' }];
     (pool.query as any).mockResolvedValueOnce({ rows: mockHistory }); // SELECT history
     (pool.query as any).mockResolvedValueOnce({ rows: [] }); // INSERT user message
-    (streamChatCompletion as any).mockImplementation(async (messages, res, threadId) => {
-      res.write(`data: ${JSON.stringify({ type: 'token', content: 'Hi' })}\n\n`);
-      res.write(`data: ${JSON.stringify({ type: 'done' })}\n\n`);
-      res.end();
-    });
+    (streamChatCompletion as any).mockImplementation(
+      async (messages: any, res: any, threadId: string) => {
+        res.write(`data: ${JSON.stringify({ type: 'token', content: 'Hi' })}\n\n`);
+        res.write(`data: ${JSON.stringify({ type: 'done' })}\n\n`);
+        res.end();
+      }
+    );
 
     const response = await request(app)
       .post('/api/chat/stream')
