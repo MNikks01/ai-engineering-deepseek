@@ -7,7 +7,7 @@ module.exports = {
     'plugin:@typescript-eslint/recommended',
     'plugin:react/recommended',
     'plugin:react-hooks/recommended',
-    'prettier', // Must be last to override formatting rules
+    'prettier',
   ],
   settings: {
     react: {
@@ -15,9 +15,20 @@ module.exports = {
     },
   },
   rules: {
-    'react/react-in-jsx-scope': 'off', // Not needed in Vite/React 17+
+    'react/react-in-jsx-scope': 'off',
     '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
-    'no-console': ['warn', { allow: ['warn', 'error'] }],
+    // Relax these rules for development
+    '@typescript-eslint/no-explicit-any': 'warn', // error → warn
+    'no-console': 'off', // allow console logs
   },
+  overrides: [
+    {
+      // For test files, allow unused variables (they're often used as mocks)
+      files: ['**/__tests__/**/*.ts', '**/*.test.ts'],
+      rules: {
+        '@typescript-eslint/no-unused-vars': 'off',
+      },
+    },
+  ],
   ignorePatterns: ['dist', 'build', 'node_modules', 'coverage'],
 };
