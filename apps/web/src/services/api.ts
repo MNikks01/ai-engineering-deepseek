@@ -3,6 +3,7 @@ const API_BASE = '/api';
 export interface Thread {
   id: string;
   title: string;
+  system_prompt?: string;
   created_at: string;
 }
 
@@ -43,4 +44,18 @@ export async function sendMessage(
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ messages, threadId }),
   });
+}
+
+export async function updateThread(
+  threadId: string,
+  updates: { title?: string; system_prompt?: string }
+): Promise<Thread> {
+  const response = await fetch(`${API_BASE}/threads/${threadId}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(updates),
+  });
+  if (!response.ok) throw new Error('Failed to update thread');
+  const data = await response.json();
+  return data.thread;
 }

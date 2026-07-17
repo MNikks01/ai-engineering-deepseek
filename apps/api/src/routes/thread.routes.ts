@@ -7,7 +7,7 @@ const router = Router();
 router.get('/', async (req: Request, res: Response) => {
   try {
     const result = await pool.query(
-      'SELECT id, title, created_at FROM threads ORDER BY created_at DESC'
+      'SELECT id, title, system_prompt, created_at FROM threads ORDER BY created_at DESC'
     );
     res.json({ threads: result.rows });
   } catch (error) {
@@ -43,6 +43,29 @@ router.get('/:id/messages', async (req: Request, res: Response) => {
   } catch (error) {
     console.error('Error fetching messages:', error);
     res.status(500).json({ error: 'Failed to fetch messages' });
+  }
+});
+
+// PUT /api/threads/:id - Update thread (e.g., title, system_prompt)
+router.put('/:id', async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { title, system_prompt } = req.body;
+  try {
+    const result = await pool.query(
+      `UPDATE threads SET 
+        title = COALESCE($1, title),
+        system_prompt = COALESCE($2, system_prompt)
+      WHERE id = $3
+      RETURNING *`,
+      [title, system_prompt, id]
+    );
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Thread not found' });
+    }
+    res.json({ thread: result.rows[0] });
+  } catch (error) {
+    console.error('Error updating thread:', error);
+    res.status(500).json({ error: 'Failed to update thread' });
   }
 });
 

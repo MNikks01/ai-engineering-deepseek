@@ -22,21 +22,31 @@ router.post('/stream', async (req: Request, res: Response) => {
       threadId = result.rows[0].id;
     }
 
-    // 2. Fetch existing messages for this thread
+    // 2. Fetch the thread's system prompt
+    const threadResult = await pool.query('SELECT system_prompt FROM threads WHERE id = $1', [
+      threadId,
+    ]);
+    const systemPrompt = threadResult.rows[0]?.system_prompt || 'You are a helpful assistant.';
+
+    // 3. Fetch existing messages for this thread
     const historyResult = await pool.query(
       'SELECT role, content FROM messages WHERE thread_id = $1 ORDER BY created_at ASC',
       [threadId]
     );
     const history = historyResult.rows;
 
-    // 3. Combine history + new user message
-    const fullHistory = [...history, ...messages];
+    // 4. Remove any system message sent from the frontend (to avoid conflicts/duplication)
+    const userMessages = messages.filter((m) => m.role !== 'system');
 
-    // 4. Truncate to fit the token limit (4000 tokens for safety)
+    // 5. Build the full conversation: system prompt (always first), then history, then new user messages
+    const systemMessage = { role: 'system', content: systemPrompt };
+    const fullHistory = [systemMessage, ...history, ...userMessages];
+
+    // 6. Truncate to fit the token limit (4000 tokens for safety)
     const truncated = truncateMessages(fullHistory, 4000);
 
-    // 5. Save the user's new message to DB
-    const userMsg = messages[messages.length - 1];
+    // 7. Save the user's new message to DB
+    const userMsg = userMessages[userMessages.length - 1];
     if (userMsg?.role === 'user') {
       await pool.query('INSERT INTO messages (thread_id, role, content) VALUES ($1, $2, $3)', [
         threadId,
@@ -45,7 +55,7 @@ router.post('/stream', async (req: Request, res: Response) => {
       ]);
     }
 
-    // 6. Stream the response – pass threadId so assistant message can be saved
+    // 8. Stream the response – pass threadId so assistant message can be saved
     await streamChatCompletion(truncated, res, threadId);
   } catch (error) {
     console.error('Chat route error:', error);

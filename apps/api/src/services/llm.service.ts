@@ -19,6 +19,10 @@ type SSEPayload = { type: string; content?: string; message?: string };
 
 function sendSSE(res: Response, data: SSEPayload) {
   res.write(`data: ${JSON.stringify(data)}\n\n`);
+  // Force flush to send immediately
+  if (typeof (res as any).flush === 'function') {
+    (res as any).flush();
+  }
 }
 
 export async function streamChatCompletion(

@@ -13,8 +13,22 @@ export async function initDatabase() {
     CREATE TABLE IF NOT EXISTS threads (
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
       title TEXT DEFAULT 'New Chat',
+      system_prompt TEXT DEFAULT 'You are a helpful assistant.',
       created_at TIMESTAMP DEFAULT NOW()
     );
+  `);
+
+  // Add column if missing (for existing databases)
+  await pool.query(`
+    DO $$
+    BEGIN
+      IF NOT EXISTS (
+        SELECT 1 FROM information_schema.columns
+        WHERE table_name='threads' AND column_name='system_prompt'
+      ) THEN
+        ALTER TABLE threads ADD COLUMN system_prompt TEXT DEFAULT 'You are a helpful assistant.';
+      END IF;
+    END $$;
   `);
 
   await pool.query(`

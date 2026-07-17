@@ -1,7 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useChatStream } from './hooks/useChatStream';
 import { Sidebar } from './components/Sidebar';
-import { fetchThreads, fetchThreadMessages, deleteThread, Thread, Message } from './services/api';
+import {
+  fetchThreads,
+  fetchThreadMessages,
+  deleteThread,
+  Thread,
+  Message,
+  updateThread,
+} from './services/api';
 
 function App() {
   const [threads, setThreads] = useState<Thread[]>([]);
@@ -87,6 +94,17 @@ function App() {
     // After streaming finishes, the useEffect below will handle reloading
   }
 
+  async function handleUpdateSystemPrompt(threadId: string, prompt: string) {
+    try {
+      await updateThread(threadId, { system_prompt: prompt });
+      // Refresh threads to reflect the updated prompt
+      await loadThreads();
+      // Optionally reload messages if needed (no change)
+    } catch (err) {
+      console.error('Failed to update system prompt:', err);
+    }
+  }
+
   // Reload data after streaming finishes
   useEffect(() => {
     if (!isStreaming && streamingText) {
@@ -113,6 +131,7 @@ function App() {
   return (
     <div style={{ display: 'flex', height: '100vh' }}>
       <Sidebar
+        onUpdateSystemPrompt={handleUpdateSystemPrompt}
         threads={threads}
         activeThreadId={activeThreadId}
         onSelectThread={setActiveThreadId}

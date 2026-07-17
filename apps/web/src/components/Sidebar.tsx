@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Thread } from '../services/api';
 
 interface SidebarProps {
@@ -7,6 +7,7 @@ interface SidebarProps {
   onSelectThread: (threadId: string) => void;
   onDeleteThread: (threadId: string) => void;
   onNewChat: () => void;
+  onUpdateSystemPrompt: (threadId: string, prompt: string) => void;
 }
 
 export function Sidebar({
@@ -15,7 +16,21 @@ export function Sidebar({
   onSelectThread,
   onDeleteThread,
   onNewChat,
+  onUpdateSystemPrompt,
 }: SidebarProps) {
+  const [editingThreadId, setEditingThreadId] = useState<string | null>(null);
+  const [editPrompt, setEditPrompt] = useState('');
+
+  const handleEditClick = (thread: Thread) => {
+    setEditingThreadId(thread.id);
+    setEditPrompt(thread.system_prompt || 'You are a helpful assistant.');
+  };
+
+  const handleSavePrompt = (threadId: string) => {
+    onUpdateSystemPrompt(threadId, editPrompt);
+    setEditingThreadId(null);
+  };
+
   return (
     <div style={styles.sidebar}>
       <button onClick={onNewChat} style={styles.newChatButton}>
@@ -29,20 +44,48 @@ export function Sidebar({
               ...styles.threadItem,
               ...(thread.id === activeThreadId ? styles.threadItemActive : {}),
             }}
-            onClick={() => onSelectThread(thread.id)}
           >
-            <span style={styles.threadTitle}>{thread.title || 'New Chat'}</span>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                if (confirm('Delete this conversation?')) {
-                  onDeleteThread(thread.id);
-                }
-              }}
-              style={styles.deleteButton}
-            >
-              ✕
-            </button>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              {editingThreadId === thread.id ? (
+                <div style={{ display: 'flex', gap: 4 }}>
+                  <input
+                    type="text"
+                    value={editPrompt}
+                    onChange={(e) => setEditPrompt(e.target.value)}
+                    style={{ flex: 1, fontSize: '12px', padding: '4px' }}
+                    autoFocus
+                  />
+                  <button onClick={() => handleSavePrompt(thread.id)} style={styles.saveButton}>
+                    💾
+                  </button>
+                  <button onClick={() => setEditingThreadId(null)} style={styles.cancelButton}>
+                    ✕
+                  </button>
+                </div>
+              ) : (
+                <span style={styles.threadTitle} onClick={() => onSelectThread(thread.id)}>
+                  {thread.title || 'New Chat'}
+                </span>
+              )}
+            </div>
+            <div style={{ display: 'flex', gap: 4 }}>
+              {thread.id === activeThreadId && editingThreadId !== thread.id && (
+                <button onClick={() => handleEditClick(thread)} style={styles.editButton}>
+                  ⚙️
+                </button>
+              )}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (confirm('Delete this conversation?')) {
+                    onDeleteThread(thread.id);
+                  }
+                }}
+                style={styles.deleteButton}
+              >
+                ✕
+              </button>
+            </div>
           </div>
         ))}
       </div>
@@ -60,6 +103,7 @@ const styles: Record<string, React.CSSProperties> = {
     flexDirection: 'column',
     padding: '12px',
     overflowY: 'auto',
+    flexShrink: 0,
   },
   newChatButton: {
     padding: '10px 16px',
@@ -96,11 +140,36 @@ const styles: Record<string, React.CSSProperties> = {
     whiteSpace: 'nowrap',
     flex: 1,
   },
+  editButton: {
+    background: 'none',
+    border: 'none',
+    cursor: 'pointer',
+    color: '#666',
+    fontSize: '14px',
+    padding: '4px 6px',
+    borderRadius: '4px',
+  },
   deleteButton: {
     background: 'none',
     border: 'none',
     cursor: 'pointer',
     color: '#888',
+    fontSize: '14px',
+    padding: '4px 6px',
+    borderRadius: '4px',
+  },
+  saveButton: {
+    background: 'none',
+    border: 'none',
+    cursor: 'pointer',
+    fontSize: '14px',
+    padding: '4px 6px',
+    borderRadius: '4px',
+  },
+  cancelButton: {
+    background: 'none',
+    border: 'none',
+    cursor: 'pointer',
     fontSize: '14px',
     padding: '4px 6px',
     borderRadius: '4px',
